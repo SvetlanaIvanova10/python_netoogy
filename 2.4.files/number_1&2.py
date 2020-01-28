@@ -1,4 +1,5 @@
 from pprint import pprint
+
 def dict_recipes():
     cook_book = {}
     for line in recipes:
@@ -39,9 +40,6 @@ def get_shop_list_by_dishes(dishes, person_count):
     pprint(ingridients)
 
 if __name__ == '__main__':
-    # Я сделала в разных with, потому что,если запустить в одном, то выполняется правильно только первая функция
-    #
-
     with open("recipes.txt", encoding='utf8') as recipes:
         out_cook_book(dict_recipes())
         recipes.seek(0)
