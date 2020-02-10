@@ -52,7 +52,7 @@ import requests
 from urllib.parse import urlencode
 import time
 import json
-delay = 0.5
+
 APP_ID = 7304809
 BASE_URL = 'https://oauth.vk.com/authorize'
 auth_data = {
@@ -62,22 +62,21 @@ auth_data = {
     'scope': 'friends, groups',
     'v': '5.103',
 }
-
 print('?'.join((BASE_URL, urlencode(auth_data))))
-# TOKEN = '4b0fa3857b3286a00b60be6a73ca3c3912327d007a62979a7ababc2d2540dfef6f6d702f84b0b3ad01ecb'
-# TOKEN = '3d94296b08d61cffd60902aa32a6f47a1e0bd1d57838c320de1d1b15667127fe2a98ea56a7f57f60fe3ca'
 TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
 params = {
     'user_id' : id,
     'access_token': TOKEN,
     'v': '5.103'
 }
-
+delay = 0.5
 class User:
 
-    def __init__(self, id, screen_name = None, first_name = None, last_name = None):
-        self.id = id
-        self.id = screen_name
+    def __init__(self, id = None, screen_name = None, first_name = None, last_name = None):
+        if type(id) != str:
+            self.id = id
+        else:
+            self.id = screen_name
         self.token = TOKEN
         self.first_name = first_name
         self.last_name = last_name
@@ -106,91 +105,63 @@ class User:
             time.sleep(delay)
         return response.json()
 
-    def get_friends(self):
-        params = self.get_params()
-        response = requests.get(
-            'https://api.vk.com/method/friends.get',
-            params
-        )
-        print('**')
-        return response.json()
-    def print_get_friends(self):
-        response = self.get_friends()
-        for i in response['response']['items']:
-            User(i).get_info()
-
     def groups_vk(self):
         params = self.get_params()
-        params['extended'] = 1
         response = requests.get(
             'https://api.vk.com/method/groups.get',
             params
         )
+
         print('***')
         return response.json()
 
-    def groups_vk_friends(self):
-        friends = self.get_friends()
-        list_groups_friends = []
-        for id_friend in friends['response']['items']:
-            groups = User(id_friend).groups_vk()
-            if 'error' in groups:
-                continue
-            list_groups_friends.append(groups)
-            time.sleep(delay)
-        return list_groups_friends
-
-    def id_vk_groups_friends(self):
-        groups_list = self.groups_vk_friends()
-        only_groups_id = []
-        for group  in groups_list:
-            for id_groups in group['response']['items']:
-                    only_groups_id.append(id_groups['id'])
-                    print(f"работает на id{id_groups['id']}")
-                    time.sleep(delay)
-        return only_groups_id
-
     def unique_groups(self):
-        groups_friends = set(self.id_vk_groups_friends())
-        print('*****')
-        my_groups = self.groups_vk()
+        groups = self.groups_vk()
+        list_groups =[]
+        try:
+            for group in groups['response']['items']:
+                params['filter'] = 'friends'
+                params['group_id'] = group
+                response = requests.get(
+                    'https://api.vk.com/method/groups.getMembers',
+                    params
+                )
 
-        my_groups_id = []
-        for id_groups in my_groups['response']['items']:
-            my_groups_id.append(id_groups['id'])
-            time.sleep(delay)
-        return set(my_groups_id).difference(groups_friends)
+                print('++')
+                time.sleep(delay)
+                if response.json()['response']['count'] == 0:
+                    list_groups.append(group)
+                else:
+                    continue
+        except Exception:
+            print('Что-то пошло не так')
+            print(Exception)
+        return list_groups
 
     def info_about_unique_groups(self):
-        id_unique_groups = list(self.unique_groups())
+        id_unique_groups = self.unique_groups()
         info_about_group = []
         for id_group in id_unique_groups:
-            params = {'group_id': id_group,
-                      'fields': 'members_count',
-                      'access_token': TOKEN,
-                      'v': '5.103'
-            }
+            params = self.get_params()
+            params['group_id'] = id_group
+            params['fields'] = 'members_count'
             response = requests.get(
                 'https://api.vk.com/method/groups.getById',
                 params
             )
-            info_about_group.append(response.json())
+            info_about_group.append(response.json()['response'])
             print('+')
             time.sleep(delay)
         return info_about_group
 
 if __name__ == '__main__':
-    vladimir = User(39946498)
-    svetlana = User(308475542)
     evgen = User(171691064)
-    # evgen.get_info()
     evgeny = User('eshmargunov')
-    # pprint(evgeny.get_info())
-    # with open('groups.json', 'w', encoding='utf-8') as gr:
-    #     gr.write(json.dumps(vladimir.info_about_unique_groups()))
-    #
-    # with open("groups.json", encoding="utf-8") as datafile:
-    #     json_data = json.load(datafile)
-    #     pprint(json_data, indent=2, depth=5, width=150)
-    pprint(vladimir.info_about_unique_groups())
-    # pprint(evgen.info_about_unique_groups())
+    svetlana = User(308475542)
+
+    with open('groups.json', 'w', encoding='utf-8') as gr:
+        gr.write(json.dumps(evgeny.info_about_unique_groups()))
+    with open("groups.json", encoding="utf-8") as datafile:
+        json_data = json.load(datafile)
+        pprint(json_data, indent=2, depth=5, width=150)
+
