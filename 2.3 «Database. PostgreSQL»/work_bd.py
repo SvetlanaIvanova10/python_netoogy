@@ -54,12 +54,11 @@ def add_course(course): # просто создает курс
 def get_students(course_id): # возвращает студентов определенного курса
     with pg.connect("dbname = test_db user = test password = 1234") as conn:
         with conn.cursor() as curs:
-            curs.execute(" SELECT student_id FROM Student_course WHERE course_id = (%s)", (course_id,))
-            stud_curs = curs.fetchall()
-            for number_id in stud_curs:
-                curs.execute("select * from Student where id = (%s)", number_id)
-                stud_one_curs = curs.fetchall()
-                print(stud_one_curs)
+            curs.execute("""SELECT s.id, s.name, c.name FROM Student_course sc 
+                         inner join student s on s.id = sc.student_id
+                         inner join course c on c.id =sc.course_id where sc.course_id = (%s)  """, (course_id,))
+            curs_stud = curs.fetchall()
+            pprint(curs_stud)
 
 students = {}
 def add_students(course_id, students): # создает студентов и
@@ -90,12 +89,9 @@ def add_student(student): # просто создает студента
 def get_student(student_id):
     with pg.connect("dbname = test_db user = test password = 1234") as conn:
         with conn.cursor() as curs:
-            curs.execute("select * from Student")
+            curs.execute("select * from Student where id = (%s)", (student_id,))
             stud = curs.fetchall()
-            for rowcount in stud:
-                for id_stud in rowcount:
-                    if id_stud == student_id:
-                        print(rowcount)
+            print(stud)
 
 
 
@@ -104,6 +100,6 @@ if __name__ == '__main__':
     add_student({'name': 'Sveta3', 'birth': '2.10.1997', 'gpa': 65})
     add_students(2, {'name': 'Sveta4', 'birth': '02.10.1997', 'gpa': 35})
     add_course({'name': 'с++'})
-    get_student(1)
+    get_student(3)
     get_students(1)
 
