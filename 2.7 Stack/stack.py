@@ -17,20 +17,18 @@ class Stack():
 
     def push(self, new_element):
         revers_elements = list(self.elements)
-        revers_elements.reverse()
         revers_elements.append(new_element)
-        revers_elements.reverse()
         self.elements = revers_elements
         return self.elements
 
     def pop(self):
-        self.elements.pop(0)
-        # print(f'Верхний элемент стека удален. Верхний элемент стека: {self.elements[0]}')
+        self.elements.pop(-1)
+        # print(f'Верхний элемент стека удален. Верхний элемент стека: {self.elements[-1]}')
         return self.elements[0:]
 
     def peek(self):
-        # print(f'Верхний элемент стека: {self.elements[0]}')
-        return self.elements[0]
+        # print(f'Верхний элемент стека: {self.elements[-1]}')
+        return self.elements[-1]
 
     def size(self):
         size_elements = len(self.elements)
