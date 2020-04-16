@@ -12,7 +12,7 @@ auth_data = {
     'client_id': APP_ID,
     'display': 'page',
     'response_type': 'token',
-    'scope': 'friends, photos, audio, video, pages, status, wall, groups',
+    'scope': 'friends, photos, groups',
     'v': '5.103',
 }
 print('?'.join((BASE_URL, urlencode(auth_data))))
