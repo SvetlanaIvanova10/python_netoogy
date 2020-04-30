@@ -107,7 +107,7 @@ class User:
             age_from = age_from,
             age_to = age_to,
             status = status,
-            count = 5,
+            count = 1000,
             has_photo = 1,
             fields=f"{'interests'}, {'sex'}, {'movies'}, {'music'}, {'bdate'}, {'city'}, {'books'}",
             v='5.103'
@@ -185,10 +185,10 @@ class User:
         return dict_count
 
     def common_interests(self):
-        interests = str(input('Введите свои интересы'))
-        books = str(input('Введите свои любимые книги'))
-        music = str(input('Введите свою любимую музыку'))
-        movies = str(input('Введите свои любимые фильмы'))
+        interests = str(input('Введите свои интересы: '))
+        books = str(input('Введите свои любимые книги: '))
+        music = str(input('Введите свою любимую музыку: '))
+        movies = str(input('Введите свои любимые фильмы: '))
         self.interests = (interests + ' ' + books + ' ' + music + ' ' + movies).replace(',', '').split(' ')
         interests_filter = {}
         interests_matches = {}
@@ -302,9 +302,9 @@ class User:
 
 
 if __name__ == '__main__':
-    # sveta = User(308475542)
-    # sveta.write_in_bd()
-    alex = User(19165090)
-    pprint(alex.get_info())
+    sveta = User(308475542)
+    sveta.write_in_bd()
+    # alex = User(19165090)
+    # pprint(alex.get_info())
     # alex.write_in_bd()
 
