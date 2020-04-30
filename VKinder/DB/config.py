@@ -1,0 +1,1 @@
+connector  = "dbname = vkinder user = test password = 1234"

@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import requests
 import main
 
@@ -8,8 +9,7 @@ class Test_My_Class(unittest.TestCase):
         self.user = main.User(308475542)
 
     def test_get_params(self):
-         expected_response = {
-            "response": [{
+         expected_response = [{
             "id": 308475542,
             "first_name": "Света",
             "last_name": "Иванова",
@@ -26,7 +26,6 @@ class Test_My_Class(unittest.TestCase):
             "movies": "Гарри Поттер, Доктор Кто, Чужестранка",
             "books": "Гарри Поттер"
             }]
-         }
          self.info = self.user.get_info()
          self.assertEqual(self.info, expected_response)
 
@@ -51,6 +50,25 @@ class Test_My_Class(unittest.TestCase):
         len_dict = self.user.get_params_for_pair().keys()
         self.assertCountEqual(len_dict, expected_len)
 
+    def test_common_friends(self):
+        expected_type = dict
+        get_type = type(self.user.common_friends())
+        self.assertEqual(expected_type, get_type)
+
+    def test_common_groups(self):
+        expected_type = dict
+        get_type = type(self.user.common_groups())
+        self.assertEqual(expected_type, get_type)
+
+    def test_common_interests(self):
+        expected_type = dict
+        interests = str('пазлы, программирование, python')
+        books = str('Гарри Поттер, цветы')
+        music = str('Люмен, Ария')
+        movies = str('Чужестранка, мир дикого запада, гарри поттер, мальчик в полосатой пижаме')
+        with patch('main.input', side_effect=[interests, books, music, movies]):
+            get_type = type(self.user.common_interests())
+        self.assertEqual(expected_type, get_type)
 
 
 if __name__ == '__main__':
